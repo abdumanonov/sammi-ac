@@ -1,18 +1,43 @@
+import AuthServise from "@/service/auth";
+
 const state = {
   isLoading: false,
+  user: null,
+  error: null,
 };
 
 const mutations = {
-  setLoading(state) {
+  registerStart(state) {
     state.isLoading = true;
+    state.user = null;
+    state.error = null;
+  },
+  registerSuccess(state, payload) {
+    state.isLoading = false;
+    state.user = payload;
+  },
+  registerFailure(state, payload) {
+    state.isLoading = false;
+    state.error = payload;
   },
 };
 
 const actions = {
-  register(context) {
-    setTimeout(() => {
-      context.commit("setLoading");
-    }, 2000);
+  register(context, user) {
+    return new Promise((resolve, reject) => {
+      context.commit("registerStart");
+      AuthServise.register(user)
+        .then((response) => {
+          console.log("Response", response.data.user);
+          context.commit("registerSuccess", response.data.user);
+          resolve(response.data.user);
+        })
+        .catch((error) => {
+          console.log("Error", error.response.data);
+          context.commit("registerFailure", error.response.data);
+          reject(error.response.data);
+        });
+    });
   },
 };
 export default {
