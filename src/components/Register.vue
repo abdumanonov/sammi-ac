@@ -10,6 +10,10 @@
       />
       <h1 class="h3 mb-3 fw-normal mt-3">Register</h1>
 
+      <ValidationError
+        v-if="validationErrors"
+        :validationErrors="validationErrors"
+      />
       <Input :label="'Name'" :type="'text'" v-model="username" />
 
       <Input :label="'Email address'" :type="'email'" v-model="email" />
@@ -24,6 +28,7 @@
 </template>
 <script>
 import { logo } from "../constants";
+import ValidationError from "./ValidationError.vue";
 export default {
   data() {
     return {
@@ -33,9 +38,15 @@ export default {
       password: "",
     };
   },
+  components: {
+    ValidationError,
+  },
   computed: {
     isLoading() {
       return this.$store.state.auth.isLoading;
+    },
+    validationErrors() {
+      return this.$store.state.auth.errors;
     },
   },
   methods: {
@@ -48,10 +59,9 @@ export default {
       };
       this.$store
         .dispatch("register", data)
-        .then(
-          (user) => console.log("USER", user),
-          this.$router.push({ name: "home" })
-        )
+        .then((user) => {
+          console.log("USER", user), this.$router.push({ name: "home" });
+        })
         .catch((err) => console.log("ERROR", err));
     },
   },

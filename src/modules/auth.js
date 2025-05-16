@@ -1,16 +1,17 @@
 import AuthServise from "@/service/auth";
+import { setItem } from "@/helpers/persistantStorage";
 
 const state = {
   isLoading: false,
   user: null,
-  error: null,
+  errors: null,
 };
 
 const mutations = {
   registerStart(state) {
     state.isLoading = true;
     state.user = null;
-    state.error = null;
+    state.errors = null;
   },
   registerSuccess(state, payload) {
     state.isLoading = false;
@@ -18,7 +19,7 @@ const mutations = {
   },
   registerFailure(state, payload) {
     state.isLoading = false;
-    state.error = payload;
+    state.errors = payload.errors;
   },
 };
 
@@ -28,12 +29,11 @@ const actions = {
       context.commit("registerStart");
       AuthServise.register(user)
         .then((response) => {
-          console.log("Response", response.data.user);
           context.commit("registerSuccess", response.data.user);
+          setItem("token", response.data.user.token);
           resolve(response.data.user);
         })
         .catch((error) => {
-          console.log("Error", error.response.data);
           context.commit("registerFailure", error.response.data);
           reject(error.response.data);
         });
