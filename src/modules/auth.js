@@ -1,11 +1,25 @@
 import AuthServise from "@/service/auth";
 import { setItem } from "@/helpers/persistantStorage";
+import { gettersTypes } from "./types";
+// import { response } from "../../localapi/src/lib/app";
 
 const state = {
   isLoading: false,
   user: null,
   errors: null,
   isLoggedIn: null,
+};
+
+const getters = {
+  [gettersTypes.currentUser]: (state) => {
+    return state.user;
+  },
+  [gettersTypes.isLoggedIn]: (state) => {
+    return Boolean(state.isLoggedIn);
+  },
+  [gettersTypes.isAnonymous]: (state) => {
+    return state.isLoggedIn === false;
+  },
 };
 
 const mutations = {
@@ -41,6 +55,19 @@ const mutations = {
     state.errors = payload.errors;
     state.isLoggedIn = false;
   },
+  currentUserStart(state) {
+    state.isLoading = true;
+  },
+  currentUserSuccess(state, payload) {
+    state.isLoading = false;
+    state.user = payload;
+    state.isLoggedIn = true;
+  },
+  currentUserFailure(state) {
+    state.isLoading = false;
+    state.user = null;
+    state.isLoggedIn = false;
+  },
 };
 
 const actions = {
@@ -74,9 +101,21 @@ const actions = {
         });
     });
   },
+  getUser(context) {
+    return new Promise((resolve) => {
+      context.commit("currentUserStart");
+      AuthServise.getUser()
+        .then((response) => {
+          context.commit("currentUserSuccess", response.data.user);
+          resolve(response.data.user);
+        })
+        .catch(() => context.commit("currentUserFailure"));
+    });
+  },
 };
 export default {
   state,
   mutations,
   actions,
+  getters,
 };
