@@ -17,9 +17,20 @@
     <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
       <template v-if="isLoggedIn">
         <RouterLink
+          :to="{ name: 'create-article' }"
+          class="me-3 py-2 link-body-emphasis text-decoration-none"
+          >Create article</RouterLink
+        >
+        <RouterLink
           :to="{ name: 'home' }"
           class="me-3 py-2 link-body-emphasis text-decoration-none"
           >{{ currentUser.username }}</RouterLink
+        >
+        <a
+          href="#"
+          class="me-3 py-2 link-body-emphasis text-decoration-none"
+          @click="logout"
+          >Logout</a
         >
       </template>
       <template v-if="isAnonymous">
@@ -58,6 +69,9 @@ export default {
   methods: {
     toHomeHandler() {
       return this.$router.push({ name: "home" });
+    },
+    logout() {
+      return this.$store.dispatch("logout");
     },
   },
 };

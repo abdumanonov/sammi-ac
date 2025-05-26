@@ -1,7 +1,6 @@
 import AuthServise from "@/service/auth";
-import { setItem } from "@/helpers/persistantStorage";
+import { removeItem, setItem } from "@/helpers/persistantStorage";
 import { gettersTypes } from "./types";
-// import { response } from "../../localapi/src/lib/app";
 
 const state = {
   isLoading: false,
@@ -68,6 +67,10 @@ const mutations = {
     state.user = null;
     state.isLoggedIn = false;
   },
+  logout(state) {
+    state.isLoggedIn = false;
+    state.user = null;
+  },
 };
 
 const actions = {
@@ -111,6 +114,10 @@ const actions = {
         })
         .catch(() => context.commit("currentUserFailure"));
     });
+  },
+  logout(context) {
+    context.commit("logout");
+    removeItem("token");
   },
 };
 export default {
